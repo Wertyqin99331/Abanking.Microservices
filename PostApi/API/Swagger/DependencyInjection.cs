@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Core.Swagger;
 
-namespace Api.Swagger;
+namespace API.Swagger;
 
 public static class DependencyInjection
 {
