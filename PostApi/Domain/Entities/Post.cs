@@ -13,6 +13,8 @@ public class Post : IDbEntity<Guid>
 	public required Text Text { get; set; }
 	public required DateTime DateCreated { get; init; }
 
+	public List<Like> Likes { get; set; } = [];
+
 	public static Result<Post> Create(Guid id, Guid userId, string title, string text)
 	{
 		// Todo Check that user with this id exists
@@ -25,7 +27,7 @@ public class Post : IDbEntity<Guid>
 		if (textResult.IsFailure)
 			return Result.Failure<Post>(textResult.Error);
 
-		return new Post()
+		return new Post
 		{
 			Id = id,
 			UserId = userId,

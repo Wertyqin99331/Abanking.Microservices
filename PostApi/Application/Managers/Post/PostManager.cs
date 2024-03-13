@@ -1,4 +1,5 @@
-﻿using Application.Abstractions;
+﻿using System.Transactions;
+using Application.Abstractions;
 using Application.Managers.Post.Dto;
 using Core.Authentication;
 using CSharpFunctionalExtensions;
@@ -65,6 +66,9 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		if (post is null)
 			return Result.Failure("Нет поста с таким id");
 
+		if (post.UserId != userId)
+			return Result.Failure("У вас нет прав на удаление этого поста");
+
 		dbContext.Posts.Remove(post);
 		await dbContext.SaveChangesAsync();
 
@@ -76,10 +80,14 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		var userIdResult = authenticationHelper.GetUserId();
 		if (userIdResult.IsFailure)
 			return Result.Failure<GetPostByIdResponse>(userIdResult.Error);
+		
 
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
 		if (post is null)
 			return Result.Failure<GetPostByIdResponse>("Нет поста с таким id");
+
+		if (post.UserId != userIdResult.Value)
+			return Result.Failure<GetPostByIdResponse>("У вас нет прав для редактирования этого поста");
 
 		var updateResult = post.Update(body.Title, body.Text);
 		if (updateResult.IsFailure)

@@ -10,6 +10,7 @@ public class PostDbContext: DbContext, IPostDbContext
 	public PostDbContext(DbContextOptions<PostDbContext> options): base(options) {}
 	
 	public DbSet<Post> Posts { get; set; } = null!;
+	public DbSet<Like> Likes { get; set; } = null!;
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
