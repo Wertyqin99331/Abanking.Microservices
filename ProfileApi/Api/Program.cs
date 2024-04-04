@@ -1,4 +1,3 @@
-using System.Reflection;
 using Api.Swagger;
 using Core.Authentication;
 using Core.Logging;

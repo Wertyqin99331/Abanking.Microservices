@@ -1,11 +1,13 @@
 using API.Swagger;
 using Application;
 using Core.Authentication;
+using Core.HttpLogic;
 using Core.Logging;
 using Core.Mapping;
 using Core.Middlewares;
 using Microsoft.AspNetCore.Authentication;
 using Persistence;
+using ProfileConnection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,10 @@ builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 
 builder.Services.AddAuthenticationHelper();
+
+builder.Services.AddHttpRequestService();
+
+builder.Services.AddProfileConnectionServices(builder.Configuration);
 
 var app = builder.Build();
 

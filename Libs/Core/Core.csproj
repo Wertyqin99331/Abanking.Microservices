@@ -4,13 +4,16 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="CSharpFunctionalExtensions" Version="2.41.0" />
       <PackageReference Include="Mapster" Version="7.4.0" />
+      <PackageReference Include="Mapster.Async" Version="2.0.1" />
       <PackageReference Include="Mapster.Core" Version="1.2.1" />
       <PackageReference Include="Mapster.EFCore" Version="5.1.1" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
       <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
       <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />

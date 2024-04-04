@@ -4,6 +4,7 @@ using Logic.Managers.Profile;
 using Logic.Managers.Profile.Dto;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
+using ProfileConnection.Dto.GetProfiles;
 using GetProfileByIdResponse = Api.Controllers.Profile.Dto.GetProfileByIdResponse;
 using GetProfileResponse = Api.Controllers.Profile.Dto.GetProfileResponse;
 
@@ -93,5 +94,16 @@ public class ProfileController(IProfileManager profileManager, IMapper mapper): 
 		return result.IsFailure
 			? BadRequest(new ErrorResponse(result.Error))
 			: NoContent();
+	}
+
+	[HttpPost("/byIds")]
+	[ProducesResponseType<GetProfilesByIdsResponse>(StatusCodes.Status200OK)]
+	public async Task<IActionResult> GetProfilesById([FromBody] GetProfilesByIdRequest request)
+	{
+		var result = await profileManager.GetProfiles(request);
+
+		return result.IsFailure
+			? BadRequest(new ErrorResponse(result.Error))
+			: Ok(result.Value);
 	}
 }

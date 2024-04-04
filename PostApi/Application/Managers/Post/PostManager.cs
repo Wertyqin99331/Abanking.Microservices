@@ -6,10 +6,12 @@ using CSharpFunctionalExtensions;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using ProfileConnection.Dto.GetProfiles;
+using ProfileConnection.Interfaces;
 
 namespace Application.Managers.Post;
 
-internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authenticationHelper, IMapper mapper)
+internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authenticationHelper, IMapper mapper, IProfileConnectionService profileConnectionService)
 	: IPostManager
 {
 	public async Task<Result> CreatePost(CreatePostBody body)
@@ -31,9 +33,13 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 	public async Task<Result<GetPostByIdResponse>> GetPostById(Guid id)
 	{
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
-
-		return post is null
-			? Result.Failure<GetPostByIdResponse>("Нет поста с таким id")
+		if (post == null)
+			return Result.Failure<GetPostByIdResponse>("Нет поста с таким id");
+		
+		var getProfilesResult = await profileConnectionService.GetProfiles(new GetProfilesByIdRequest([post.UserId]));
+		if (getProfilesResult.IsFailure)
+			return Result.Failure<GetPostByIdResponse>(getProfilesResult.Error);
+				
 			: mapper.Map<GetPostByIdResponse>(post);
 	}
 
@@ -41,13 +47,14 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		Func<Domain.Entities.Post, bool>? filter = null)
 	{
 		var query = dbContext.Posts
+			.AsNoTracking()
 			.OrderBy(p => p.DateCreated)
 			.Skip((page - 1) * countPerPage)
 			.Take(countPerPage);
 
 		if (filter is not null)
 			query = query.Where(p => filter(p));
-
+		
 		var posts = await query.ProjectToType<PostDto>().ToListAsync();
 		return new GetPostsResponse
 		{
@@ -65,7 +72,7 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
 		if (post is null)
 			return Result.Failure("Нет поста с таким id");
-
+		
 		if (post.UserId != userId)
 			return Result.Failure("У вас нет прав на удаление этого поста");
 
