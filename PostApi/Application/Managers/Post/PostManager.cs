@@ -11,7 +11,11 @@ using ProfileConnection.Interfaces;
 
 namespace Application.Managers.Post;
 
-internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authenticationHelper, IMapper mapper, IProfileConnectionService profileConnectionService)
+internal class PostManager(
+	IPostDbContext dbContext,
+	IAuthenticationHelper authenticationHelper,
+	IMapper mapper,
+	IProfileConnectionService profileConnectionService)
 	: IPostManager
 {
 	public async Task<Result> CreatePost(CreatePostBody body)
@@ -35,12 +39,14 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
 		if (post == null)
 			return Result.Failure<GetPostByIdResponse>("Нет поста с таким id");
-		
+
 		var getProfilesResult = await profileConnectionService.GetProfiles(new GetProfilesByIdRequest([post.UserId]));
 		if (getProfilesResult.IsFailure)
 			return Result.Failure<GetPostByIdResponse>(getProfilesResult.Error);
-				
-			: mapper.Map<GetPostByIdResponse>(post);
+
+		var profile = getProfilesResult.Value.Profiles.First();
+
+		return mapper.Map<GetPostByIdResponse>((post, profile));
 	}
 
 	public async Task<Result<GetPostsResponse>> GetPosts(int page, int countPerPage,
@@ -54,8 +60,14 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 
 		if (filter is not null)
 			query = query.Where(p => filter(p));
-		
+
 		var posts = await query.ProjectToType<PostDto>().ToListAsync();
+
+		var getProfilesResult =
+			await profileConnectionService.GetProfiles(new GetProfilesByIdRequest(posts.Select(p => p.UserId)));
+		if (getProfilesResult.IsFailure)
+			return Result.Failure<GetPostsResponse>(getProfilesResult.Error);
+
 		return new GetPostsResponse
 		{
 			Posts = posts,
@@ -72,7 +84,7 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
 		if (post is null)
 			return Result.Failure("Нет поста с таким id");
-		
+
 		if (post.UserId != userId)
 			return Result.Failure("У вас нет прав на удаление этого поста");
 
@@ -87,7 +99,7 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		var userIdResult = authenticationHelper.GetUserId();
 		if (userIdResult.IsFailure)
 			return Result.Failure<GetPostByIdResponse>(userIdResult.Error);
-		
+
 
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
 		if (post is null)

@@ -5,7 +5,7 @@ using Core.HttpLogic;
 using Core.Logging;
 using Core.Mapping;
 using Core.Middlewares;
-using Microsoft.AspNetCore.Authentication;
+using Core.TraceIdLogic;
 using Persistence;
 using ProfileConnection;
 
@@ -18,6 +18,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Host.AddLoggingServices();
 builder.Services.AddMappingServices();
+
+builder.Services.TryAddTraceId();
 
 builder.Services.AddGlobalExceptionHandlerServices();
 
