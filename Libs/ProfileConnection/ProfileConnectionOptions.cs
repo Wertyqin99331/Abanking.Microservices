@@ -2,6 +2,6 @@
 
 public class ProfileConnectionOptions
 {
-	public string ProfileConnectionUrl { get; set; } = null!;
-	public string ProfileConnectionType { get; set; } = null!;
+	public string ProfileConnectionUrl { get; init; } = null!;
+	public string ProfileConnectionType { get; init; } = null!;
 }

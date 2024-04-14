@@ -13,7 +13,7 @@ public class ProfileConnectionService: IProfileConnectionService
 	private readonly IHttpRequestService _httpRequestService = null!;
 	private readonly ProfileConnectionOptions _profileConnectionOptions;
 	
-	public ProfileConnectionService(IConfiguration configuration, IServiceProvider serviceProvider, ProfileConnectionOptions profileConnectionOptions)
+	public ProfileConnectionService(IServiceProvider serviceProvider, ProfileConnectionOptions profileConnectionOptions)
 	{
 		this._profileConnectionOptions = profileConnectionOptions;
 		

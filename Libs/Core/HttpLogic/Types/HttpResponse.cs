@@ -7,5 +7,8 @@ public record HttpResponse<TResponse> : BaseHttpResponse
 	/// </summary>
 	public required TResponse? Body { get; init; }
 	
+	/// <summary>
+	/// Недесериализованное тело запроса
+	/// </summary>
 	public required HttpContent Content { get; init; }
 }

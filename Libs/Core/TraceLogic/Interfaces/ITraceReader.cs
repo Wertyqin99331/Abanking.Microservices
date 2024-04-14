@@ -7,7 +7,7 @@ namespace Core.TraceLogic.Interfaces;
 /// </summary>
 public interface ITraceReader
 {
-	string Name { get; }
+	string Name { get; } 
 
-	void WriteValue(string value);
+	void WriteValue(string? value);
 }
