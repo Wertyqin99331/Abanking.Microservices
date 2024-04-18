@@ -2,6 +2,8 @@
 
 public class ProfileConnectionOptions
 {
-	public string ProfileConnectionUrl { get; init; } = null!;
-	public string ProfileConnectionType { get; init; } = null!;
+	public string Url { get; init; } = null!;
+	public string ConnectionType { get; init; } = null!;
+	public string? QueueServiceName { get; init; }
+	public string? QueueName { get; init; }
 }

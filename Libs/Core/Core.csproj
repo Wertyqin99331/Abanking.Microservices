@@ -7,6 +7,11 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="CSharpFunctionalExtensions" Version="2.41.0" />
       <PackageReference Include="Mapster" Version="7.4.0" />
