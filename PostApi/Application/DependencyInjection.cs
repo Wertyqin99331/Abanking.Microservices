@@ -1,6 +1,5 @@
 ﻿using Application.Managers.Like;
 using Application.Managers.Post;
-using Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -11,7 +10,7 @@ public static class DependencyInjection
 	{
 		services.AddScoped<IPostManager, PostManager>();
 		services.AddScoped<ILikeManager, LikeManager>();
-
+		
 		return services;
 	}
 }

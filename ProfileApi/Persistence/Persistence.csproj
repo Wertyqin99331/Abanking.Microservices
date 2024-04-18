@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Libs\Core\Core.csproj" />
+      <ProjectReference Include="..\..\Libs\ProfileConnection\ProfileConnection.csproj" />
     </ItemGroup>
 
 </Project>

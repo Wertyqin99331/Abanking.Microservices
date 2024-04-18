@@ -6,10 +6,16 @@ using CSharpFunctionalExtensions;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using ProfileConnection.Dto.GetProfiles;
+using ProfileConnection.Interfaces;
 
 namespace Application.Managers.Post;
 
-internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authenticationHelper, IMapper mapper)
+internal class PostManager(
+	IPostDbContext dbContext,
+	IAuthenticationHelper authenticationHelper,
+	IMapper mapper,
+	IProfileConnectionService profileConnectionService)
 	: IPostManager
 {
 	public async Task<Result> CreatePost(CreatePostBody body)
@@ -31,16 +37,23 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 	public async Task<Result<GetPostByIdResponse>> GetPostById(Guid id)
 	{
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
+		if (post == null)
+			return Result.Failure<GetPostByIdResponse>("Нет поста с таким id");
 
-		return post is null
-			? Result.Failure<GetPostByIdResponse>("Нет поста с таким id")
-			: mapper.Map<GetPostByIdResponse>(post);
+		var getProfilesResult = await profileConnectionService.GetProfiles(new GetProfilesByIdRequest([post.UserId]));
+		if (getProfilesResult.IsFailure)
+			return Result.Failure<GetPostByIdResponse>(getProfilesResult.Error);
+
+		var profile = getProfilesResult.Value.Profiles.First();
+
+		return mapper.Map<GetPostByIdResponse>((post, profile));
 	}
 
 	public async Task<Result<GetPostsResponse>> GetPosts(int page, int countPerPage,
 		Func<Domain.Entities.Post, bool>? filter = null)
 	{
 		var query = dbContext.Posts
+			.AsNoTracking()
 			.OrderBy(p => p.DateCreated)
 			.Skip((page - 1) * countPerPage)
 			.Take(countPerPage);
@@ -49,6 +62,12 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 			query = query.Where(p => filter(p));
 
 		var posts = await query.ProjectToType<PostDto>().ToListAsync();
+
+		var getProfilesResult =
+			await profileConnectionService.GetProfiles(new GetProfilesByIdRequest(posts.Select(p => p.UserId)));
+		if (getProfilesResult.IsFailure)
+			return Result.Failure<GetPostsResponse>(getProfilesResult.Error);
+
 		return new GetPostsResponse
 		{
 			Posts = posts,
@@ -80,7 +99,7 @@ internal class PostManager(IPostDbContext dbContext, IAuthenticationHelper authe
 		var userIdResult = authenticationHelper.GetUserId();
 		if (userIdResult.IsFailure)
 			return Result.Failure<GetPostByIdResponse>(userIdResult.Error);
-		
+
 
 		var post = await dbContext.Posts.FirstOrDefaultAsync(p => p.Id == id);
 		if (post is null)

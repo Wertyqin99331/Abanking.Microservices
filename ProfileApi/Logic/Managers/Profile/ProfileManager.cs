@@ -1,9 +1,11 @@
 ﻿using Core.Authentication;
 using CSharpFunctionalExtensions;
 using Logic.Managers.Profile.Dto;
+using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using ProfileConnection.Dto.GetProfiles;
 
 namespace Logic.Managers.Profile;
 
@@ -77,5 +79,17 @@ public class ProfileManager(ProfileDbContext dbContext, IAuthenticationHelper au
 		await dbContext.SaveChangesAsync();
 
 		return Result.Success();
+	}
+
+	public async Task<Result<GetProfilesByIdResponse>> GetProfiles(GetProfilesByIdRequest request)
+	{
+		var profiles = await dbContext.Profiles.Where(p => request.Ids.Contains(p.Id))
+			.ProjectToType<GetProfilesDto>()
+			.ToListAsync();
+
+		return new GetProfilesByIdResponse
+		{
+			Profiles = profiles
+		};
 	}
 }

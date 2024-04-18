@@ -1,4 +1,6 @@
 ﻿using Application.Abstractions;
+using Domain.Entities;
+using Domain.ValueObjects.Post;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,11 +1,13 @@
 using API.Swagger;
 using Application;
 using Core.Authentication;
+using Core.HttpLogic;
 using Core.Logging;
 using Core.Mapping;
 using Core.Middlewares;
-using Microsoft.AspNetCore.Authentication;
+using Core.TraceIdLogic;
 using Persistence;
+using ProfileConnection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +19,18 @@ builder.Services.AddHttpContextAccessor();
 builder.Host.AddLoggingServices();
 builder.Services.AddMappingServices();
 
+builder.Services.TryAddTraceId();
+
 builder.Services.AddGlobalExceptionHandlerServices();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 
 builder.Services.AddAuthenticationHelper();
+
+builder.Services.AddHttpRequestService();
+
+builder.Services.AddProfileConnectionServices(builder.Configuration);
 
 var app = builder.Build();
 
