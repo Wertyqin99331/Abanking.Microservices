@@ -4,6 +4,7 @@ using Core.Logging;
 using Core.Mapping;
 using Core.Middlewares;
 using Logic;
+using Logic.Services;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,8 @@ builder.Services.AddLogicServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 
 builder.Services.AddAuthenticationHelper();
+
+builder.Services.AddHostedService<RpcServerService>();
 
 var app = builder.Build();
 

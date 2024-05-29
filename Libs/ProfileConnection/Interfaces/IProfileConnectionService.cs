@@ -9,6 +9,7 @@ public interface IProfileConnectionService
 	/// Получить профили пользователей по id
 	/// </summary>
 	/// <param name="request">Запрос</param>
+	/// <param name="replyQueue">Имя очереди</param>
 	/// <returns>Результат получения</returns>
-	Task<Result<GetProfilesByIdResponse>> GetProfiles(GetProfilesByIdRequest request);
+	Task<Result<GetProfilesByIdResponse>> GetProfiles(GetProfilesByIdRequest request, string replyQueue);
 }
